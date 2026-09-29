@@ -1,0 +1,7 @@
+{
+  "functions": {
+    "api/u19.js": {
+      "maxDuration": 60
+    }
+  }
+}
