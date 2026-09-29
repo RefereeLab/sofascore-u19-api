@@ -4,6 +4,16 @@ import puppeteer from "puppeteer-core";
 const WIDGET_URL =
   "https://widgets.sofascore.com/it/embed/unique-tournament/33926/season/102342/editorFixtures?showCompetitionLogo=true&widgetTheme=light";
 
+function normalizeTeamName(team) {
+  const id = team?.id;
+  const original = team?.name || team?.shortName || "";
+
+  if (id === 1211259) return "UNA HOTELS REGGIO EMILIA";
+  if (id === 1211255) return "RAGGISOLARIS ACADEMY FAEN";
+
+  return original;
+}
+
 function compactEvent(event) {
   return {
     id: event.id,
@@ -13,11 +23,11 @@ function compactEvent(event) {
     roundInfo: event.roundInfo || {},
     homeTeam: {
       id: event.homeTeam?.id,
-      name: event.homeTeam?.name || event.homeTeam?.shortName || ""
+      name: normalizeTeamName(event.homeTeam)
     },
     awayTeam: {
       id: event.awayTeam?.id,
-      name: event.awayTeam?.name || event.awayTeam?.shortName || ""
+      name: normalizeTeamName(event.awayTeam)
     },
     homeScore: event.homeScore || {},
     awayScore: event.awayScore || {}
