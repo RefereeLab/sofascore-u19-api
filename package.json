@@ -1,0 +1,7 @@
+{
+  "type": "module",
+  "dependencies": {
+    "@sparticuz/chromium": "latest",
+    "puppeteer-core": "latest"
+  }
+}
