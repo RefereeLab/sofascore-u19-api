@@ -175,6 +175,10 @@ function allEventsArchived(state) {
 }
 
 function cacheIsFresh(state, nowMs) {
+  const hasResolvedConflict = Object.entries(state?.records || {}).some(
+    ([id, record]) => record?.archiveBlocked && !historicalConflicts[id]
+  );
+  if (hasResolvedConflict) return false;
   return Number(state?.cache?.expiresAt || 0) > nowMs;
 }
 
