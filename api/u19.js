@@ -235,7 +235,7 @@ async function refreshRound(round, preloaded = null) {
           cacheMode: "empty",
           upstreamWarning: "Nessuna partita disponibile per la giornata"
         }),
-        window: { ttlMs: 10 * 60_000, swrSeconds: 1800, mode: "empty" }
+          window: { ttlMs: 30 * 60_000, swrSeconds: 1800, mode: "empty" }
       };
     }
 
@@ -354,7 +354,7 @@ async function loadCurrentRound() {
         upstreamWarning: "Nessuna giornata corrente disponibile",
         events: acquired.events
       },
-      window: { ttlMs: 10 * 60_000, swrSeconds: 1800, mode: "empty" }
+      window: { ttlMs: 30 * 60_000, swrSeconds: 1800, mode: "empty" }
     };
   }
   return refreshRound(round, acquired);
