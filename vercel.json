@@ -3,5 +3,11 @@
     "api/u19.js": {
       "maxDuration": 60
     }
-  }
+  },
+  "crons": [
+    {
+      "path": "/api/u19?cron=1",
+      "schedule": "30 23 * * *"
+    }
+  ]
 }

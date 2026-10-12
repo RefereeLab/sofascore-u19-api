@@ -1,7 +1,11 @@
 {
   "type": "module",
+  "scripts": {
+    "test": "node --test"
+  },
   "dependencies": {
     "@sparticuz/chromium": "latest",
+    "@vercel/blob": "latest",
     "puppeteer-core": "latest"
   }
 }
