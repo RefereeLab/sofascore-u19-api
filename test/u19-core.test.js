@@ -74,6 +74,15 @@ test("un conflitto storico resta bloccato e viene ricontrollato a bassa frequenz
   assert.equal(cacheWindow([finishedEvent()], { "123": later }).mode, "period-recovery");
 });
 
+test("un conflitto risolto viene sbloccato al controllo successivo", () => {
+  const blocked = updateRecord(null, finishedEvent(), "2026-10-12T20:00:00.000Z", {
+    archiveBlocked: "finale discordante"
+  });
+  const resolved = updateRecord(blocked, finishedEvent(), "2026-10-13T20:00:00.000Z");
+  assert.equal(resolved.archiveBlocked, undefined);
+  assert.equal(resolved.archivedAt, "2026-10-13T20:00:00.000Z");
+});
+
 test("riconosce quarti e supplementare coerenti", () => {
   const event = finishedEvent(86, 82);
   event.homeScore.normaltime = 80;
