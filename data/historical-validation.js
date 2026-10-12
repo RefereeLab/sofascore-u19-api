@@ -1462,6 +1462,19 @@ export default {
     ],
     "overtime": null
   },
+  "17003254": {
+    "round": 2,
+    "group": "Girone 7",
+    "home": 58,
+    "away": 76,
+    "periods": [
+      [20, 16],
+      [12, 27],
+      [7, 21],
+      [19, 12]
+    ],
+    "overtime": null
+  },
   "17251806": {
     "round": 2,
     "group": "Girone 4",
