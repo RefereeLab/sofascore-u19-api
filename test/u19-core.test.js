@@ -118,3 +118,55 @@ test("la cache distingue live, stabilizzazione e inattività", () => {
   upcoming.startTimestamp = Math.floor((Date.now() + 30 * 60_000) / 1000);
   assert.equal(cacheWindow([upcoming], {}).mode, "imminent");
 });
+
+test("una gara live prevale sempre sui conflitti storici", () => {
+  const now = Date.parse("2026-10-13T18:00:00Z");
+  const live = finishedEvent();
+  live.status.type = "inprogress";
+  const old = finishedEvent();
+  old.id = 456;
+  const window = cacheWindow([old, live], {
+    "456": { archivedAt: "2026-10-12T20:00:00Z", needsPeriodRecovery: true }
+  }, now);
+  assert.equal(window.mode, "live");
+  assert.ok(window.ttlMs <= 30_000);
+});
+
+test("una gara non ancora marcata live viene ricontrollata dopo l'orario di inizio", () => {
+  const now = Date.parse("2026-10-13T18:00:00Z");
+  const event = finishedEvent();
+  event.status.type = "notstarted";
+  event.startTimestamp = (now - 45 * 60_000) / 1000;
+  const window = cacheWindow([event], {}, now);
+  assert.equal(window.mode, "awaiting-live");
+  assert.ok(window.ttlMs <= 30_000);
+});
+
+test("la cache per i parziali storici non puo' attraversare la prossima partita", () => {
+  const now = Date.parse("2026-10-13T18:00:00Z");
+  const old = finishedEvent();
+  const future = finishedEvent();
+  future.id = 456;
+  future.status.type = "notstarted";
+  future.startTimestamp = (now + 4 * 60 * 60_000) / 1000;
+  const window = cacheWindow([old, future], {
+    "123": { archivedAt: "2026-10-13T16:00:00Z", needsPeriodRecovery: true }
+  }, now);
+  const secondsTillNextStart = (future.startTimestamp * 1000 - now) / 1000;
+  assert.equal(window.mode, "period-recovery");
+  assert.ok(window.ttlMs / 1000 + window.swrSeconds < secondsTillNextStart - 30);
+});
+
+test("una partita imminente prevale sul recupero lento dei quarti", () => {
+  const now = Date.parse("2026-10-13T18:00:00Z");
+  const old = finishedEvent();
+  const future = finishedEvent();
+  future.id = 456;
+  future.status.type = "notstarted";
+  future.startTimestamp = (now + 20 * 60_000) / 1000;
+  const window = cacheWindow([old, future], {
+    "123": { archivedAt: "2026-10-13T16:00:00Z", needsPeriodRecovery: true }
+  }, now);
+  assert.equal(window.mode, "imminent");
+  assert.ok(window.ttlMs <= 60_000);
+});

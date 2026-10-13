@@ -179,7 +179,18 @@ function cacheIsFresh(state, nowMs) {
     ([id, record]) => record?.archiveBlocked && !historicalConflicts[id]
   );
   if (hasResolvedConflict) return false;
-  return Number(state?.cache?.expiresAt || 0) > nowMs;
+  const cache = state?.cache;
+  if (!Array.isArray(cache?.events)) return false;
+  const fetchedAt = Date.parse(cache.fetchedAt || "");
+  if (!Number.isFinite(fetchedAt) || fetchedAt > nowMs) return false;
+  // Ricalcola la finestra al tempo attuale: una vecchia cache "idle"
+  // non deve sopravvivere all'avvicinarsi o all'inizio di una gara.
+  const currentWindow = cacheWindow(cache.events, state.records, nowMs);
+  const effectiveExpiry = Math.min(
+    Number(cache.expiresAt || 0),
+    fetchedAt + currentWindow.ttlMs
+  );
+  return effectiveExpiry > nowMs;
 }
 
 function buildPayload(state, events, options = {}) {
